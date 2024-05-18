@@ -23,7 +23,7 @@ class SystemInfo:
 
         # Apply color to system information output
         sys_info_output = (
-            f"OS: {os_name} {os_version}\n"
+            f"OS: {os_name}\n"
             f"Python: {python_version}\n"
             f"Hostname: {hostname}\n"
             f"IP Address: {ip_address}\n"

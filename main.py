@@ -3,6 +3,7 @@ from cpu_monitor import CPUMonitor
 from memory_monitor import MemoryMonitor
 from network_monitor import NetworkMonitor
 from system_info import SystemInfo
+from processes import ProcessMonitor
 
 # ANSI color escape codes
 COLOR_RESET = "\033[0m"
@@ -16,6 +17,7 @@ def main():
     memory_monitor = MemoryMonitor()
     network_monitor = NetworkMonitor()
     system_info = SystemInfo()
+    process_monitor = ProcessMonitor()
 
     try:
         while True:
@@ -24,39 +26,36 @@ def main():
             memory_output = memory_monitor.get_memory_usage()
             bandwidth_output = network_monitor.get_bandwidth_usage()
             sys_info_output = system_info.get_system_info()
+            processes_output = process_monitor.get_running_processes(num_processes=10)
 
             # Apply colors to entire output strings
             cpu_output = f"{COLOR_YELLOW}{cpu_output}{COLOR_RESET}"
             memory_output = f"{COLOR_GREEN}{memory_output}{COLOR_RESET}"
-            bandwidth_output = f"{COLOR_BLUE}{bandwidth_output}{COLOR_RESET}"
+            bandwidth_output = f"{COLOR_BLUE}{bandwidth_output.replace('Received', '↓').replace('Sent', '↑')}{COLOR_RESET}"
             sys_info_output = f"{COLOR_CYAN}{sys_info_output}{COLOR_RESET}"
+            processes_output = "\n".join([f"{COLOR_CYAN}Running Processes{COLOR_RESET}", "-----------------"] + processes_output)
 
             # Clear screen
             print("\033c", end='')
 
             # Print headers
-            print(f"{COLOR_CYAN}CPU & Memory{COLOR_RESET}")
-            print(f"{COLOR_CYAN}------------{COLOR_RESET}")
+            print(f"{COLOR_CYAN}CPU & Memory      Network{COLOR_RESET}")
+            print(f"{COLOR_CYAN}-------------      -------{COLOR_RESET}")
 
-            # Print CPU and Memory meters
-            print(f"{cpu_output}\n{memory_output}\n")
-
-            # Print Network header
-            print(f"{COLOR_CYAN}Network{COLOR_RESET}")
-            print(f"{COLOR_CYAN}-------{COLOR_RESET}")
-
-            # Print Network meter
-            print(f"{bandwidth_output}\n")
-
-            # Print System Info header
+            # Print meters and system info
+            print(f"{cpu_output}      {bandwidth_output}")
+            print(f"{memory_output}")
             print(f"{COLOR_CYAN}System Info{COLOR_RESET}")
             print(f"{COLOR_CYAN}-----------{COLOR_RESET}")
+            sys_info_lines = [line[:40] for line in sys_info_output.split("\n")]
+            for line in sys_info_lines:
+                print(line)
 
-            # Print System Info
-            print(sys_info_output)
+            # Print Running Processes
+            print(processes_output)
 
             # Move cursor to the top
-            print("\033[10A", end='')
+            print("\033[6A", end='')
 
             time.sleep(0.5)  # Wait for 0.5 seconds before updating again
 
