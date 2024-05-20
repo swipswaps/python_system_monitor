@@ -15,8 +15,8 @@ class NetworkMonitor:
         self.last_received = bytes_received
         self.last_sent = bytes_sent
 
-        received = new_received / 1024
-        sent = new_sent / 1024
-        total = (new_received + new_sent) / 1024
+        received_kb = new_received / 1024
+        sent_kb = new_sent / 1024
+        total_kb = (new_received + new_sent) / 1024
 
-        return f"Received: {received:.2f} KB | Sent: {sent:.2f} KB | Total: {total:.2f} KB"
+        return f"Received: {received_kb:.2f} KB | Sent: {sent_kb:.2f} KB | Total: {total_kb:.2f} KB"

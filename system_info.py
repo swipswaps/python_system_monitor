@@ -2,6 +2,7 @@ import platform
 import psutil
 import time
 import socket
+import subprocess
 
 class SystemInfo:
     def get_system_info(self):
@@ -21,7 +22,6 @@ class SystemInfo:
         battery_status = self._get_battery_status()
         battery_health = self._get_battery_health()
 
-        # Apply color to system information output
         sys_info_output = (
             f"OS: {os_name}\n"
             f"Python: {python_version}\n"
@@ -84,8 +84,8 @@ class SystemInfo:
                     ["ioreg", "-r", "-c", "AppleSmartBattery", "-k", "DesignCapacity", "-k", "MaxCapacity"],
                     universal_newlines=True
                 )
-                design_capacity = int(health_info.split('DesignCapacity')[1].split('= ')[1].split('\n')[0])
-                max_capacity = int(health_info.split('MaxCapacity')[1].split('= ')[1].split('\n')[0])
+                design_capacity = int(self._parse_health_info(health_info, 'DesignCapacity'))
+                max_capacity = int(self._parse_health_info(health_info, 'MaxCapacity'))
                 health_percent = (max_capacity / design_capacity) * 100
                 return f"{health_percent:.2f}%"
             elif os_name == 'Windows':  # Windows
@@ -96,8 +96,8 @@ class SystemInfo:
                 # Read and parse the battery_report.html to get battery health information
                 with open("battery_report.html", "r") as file:
                     report = file.read()
-                design_capacity = int(report.split('DESIGN CAPACITY')[1].split('<td>')[1].split(' mWh')[0].replace(',', ''))
-                full_charge_capacity = int(report.split('FULL CHARGE CAPACITY')[1].split('<td>')[1].split(' mWh')[0].replace(',', ''))
+                design_capacity = int(self._parse_battery_report(report, 'DESIGN CAPACITY'))
+                full_charge_capacity = int(self._parse_battery_report(report, 'FULL CHARGE CAPACITY'))
                 health_percent = (full_charge_capacity / design_capacity) * 100
                 return f"{health_percent:.2f}%"
             elif os_name == 'Linux':  # Linux
@@ -111,3 +111,10 @@ class SystemInfo:
                 return "Unsupported OS"
         except Exception as e:
             return f"Error retrieving battery health: {e}"
+
+    def _parse_health_info(self, health_info, key):
+        return health_info.split(f"{key} = ")[1].split('\n')[0].strip()
+
+    def _parse_battery_report(self, report, key):
+        return report.split(f'{key}')[1].split('<td>')[1].split(' mWh')[0].replace(',', '')
+

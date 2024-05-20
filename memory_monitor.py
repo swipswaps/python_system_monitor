@@ -12,6 +12,3 @@ class MemoryMonitor:
         memory_percent = memory / 100.0
         memory_visual = '#' * int(memory_percent * self.bars) + '-' * (self.bars - int(memory_percent * self.bars))
         return f"Memory: [{memory_visual}] {memory:.2f}%"
-
-    def get_memory_percentage(self):
-        return psutil.virtual_memory().percent
