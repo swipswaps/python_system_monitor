@@ -117,4 +117,3 @@ class SystemInfo:
 
     def _parse_battery_report(self, report, key):
         return report.split(f'{key}')[1].split('<td>')[1].split(' mWh')[0].replace(',', '')
-
